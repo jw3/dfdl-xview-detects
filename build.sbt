@@ -58,6 +58,11 @@ lazy val commonSettings = Seq(
 lazy val commonLibraries = {
   Seq(
     "org.apache.daffodil" %% "daffodil-sapi" % "latest.integration",
+    "com.typesafe.akka" %% "akka-actor-typed" % "2.6.5",
+    "com.typesafe.akka" %% "akka-stream" % "2.6.5",
+    "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.12",
+    "ch.qos.logback" % "logback-classic" % "1.2.3",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
     "org.apache.daffodil" %% "daffodil-tdml-processor" % "2.6.0" % Test,
     "com.novocode" % "junit-interface" % "0.11" % Test
   )
