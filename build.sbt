@@ -1,29 +1,64 @@
-name := "dfdl-xview-detects"
-organization := "com.ctc"
-scalaVersion := "2.12.11"
-git.useGitDescribe := true
+lazy val `dfdl-xview-detects` =
+  project
+    .in(file("."))
+    .aggregate(
+      `detects-schema`,
+      `detects-service`
+    )
+    .settings(commonSettings: _*)
+    .enablePlugins(GitVersioning)
 
-scalacOptions ++= Seq(
-  "-encoding",
-  "UTF-8",
-  "-feature",
-  "-unchecked",
-  "-deprecation",
-  "-language:postfixOps",
-  "-language:implicitConversions",
-  "-Ywarn-unused-import",
-  "-Xfatal-warnings",
-  "-Xlint:_"
+lazy val `detects-schema` =
+  project
+    .in(file("schema"))
+    .settings(commonSettings: _*)
+    .settings(
+      libraryDependencies ++= commonLibraries,
+      testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
+      crossPaths := false
+    )
+    .enablePlugins(GitVersioning)
+
+lazy val `detects-service` =
+  project
+    .in(file("service"))
+    .dependsOn(`detects-schema`)
+    .settings(commonSettings: _*)
+    .settings(
+      version in Docker := "latest",
+      dockerExposedPorts := Seq(9000),
+      dockerRepository := Some("ctcoss"),
+      libraryDependencies ++= commonLibraries
+    )
+    .enablePlugins(GitVersioning, JavaServerAppPackaging)
+
+/**
+  *
+  * Commons
+  *
+  */
+lazy val commonSettings = Seq(
+  organization := "com.ctc",
+  scalaVersion := "2.12.11",
+  git.useGitDescribe := true,
+  scalacOptions ++= Seq(
+    "-encoding",
+    "UTF-8",
+    "-feature",
+    "-unchecked",
+    "-deprecation",
+    "-language:postfixOps",
+    "-language:implicitConversions",
+    "-Ywarn-unused-import",
+    "-Xfatal-warnings",
+    "-Xlint:_"
+  )
 )
 
-libraryDependencies := Seq(
-  "org.apache.daffodil" %% "daffodil-sapi" % "latest.integration",
-  "org.apache.daffodil" %% "daffodil-tdml-processor" % "2.6.0" % Test,
-  "com.novocode" % "junit-interface" % "0.11" % Test
-
-)
-
-testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
-crossPaths := false
-
-enablePlugins(GitVersioning)
+lazy val commonLibraries = {
+  Seq(
+    "org.apache.daffodil" %% "daffodil-sapi" % "latest.integration",
+    "org.apache.daffodil" %% "daffodil-tdml-processor" % "2.6.0" % Test,
+    "com.novocode" % "junit-interface" % "0.11" % Test
+  )
+}
