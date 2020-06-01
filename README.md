@@ -49,3 +49,10 @@ This example app will process those into
       },
 ...
 ```
+
+
+### service
+
+test with
+
+`$ curl localhost:9000/api/convert --data-binary @schema/src/test/resources/test1.txt`
