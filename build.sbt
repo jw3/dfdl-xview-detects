@@ -57,6 +57,7 @@ lazy val commonSettings = Seq(
 
 lazy val commonLibraries = {
   Seq(
+    "com.iheart" %% "ficus" % "1.4.0",
     "org.apache.daffodil" %% "daffodil-sapi" % "latest.integration",
     "com.typesafe.akka" %% "akka-actor-typed" % "2.6.5",
     "com.typesafe.akka" %% "akka-stream" % "2.6.5",

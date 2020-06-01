@@ -3,6 +3,9 @@ package xview.detects
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 object protocol {
+  case class Unstructured(text: String)
+  case class Structured(text: String)
+
   case class Pt(x: Int, y: Int)
   object Pt extends DefaultJsonProtocol {
     implicit val fmt: RootJsonFormat[Pt] = jsonFormat2(Pt.apply)

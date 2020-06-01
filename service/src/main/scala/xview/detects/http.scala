@@ -1,28 +1,46 @@
 package xview.detects
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
 import akka.http.scaladsl.model.StatusCodes.OK
-import akka.http.scaladsl.server.Directives.{complete, extractExecutionContext, extractLog, get, path, pathPrefix}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.stream.scaladsl.Sink
+import akka.util.{ByteString, Timeout}
+import xview.detects.protocol.{Structured, Unstructured}
+
+import scala.concurrent.duration.DurationInt
 
 object http {
+  implicit val to: Timeout = Timeout(1.second)
 
   trait Adapter {
-    implicit def system: ActorSystem
-
-    def routes(controller: ActorRef): Route =
+    def routes(handler: ActorRef): Route =
       pathPrefix("api") {
         extractLog { logger ⇒
-          extractExecutionContext { implicit ec ⇒
+          extractMaterializer { implicit materializer =>
             path("health") {
               get {
                 complete(OK)
               }
-            }
-            // post detects
+            } ~
+              path("convert") {
+                post {
+                  extractRequest { req =>
+                    val f = req.entity.dataBytes
+                      .fold(ByteString.empty) {
+                        case (acc, b) => acc ++ b
+                      }
+                      .map(_.utf8String)
+                      .map(Unstructured)
+                      .ask[Structured](handler)
+                      .map(_.text)
+                      .runWith(Sink.head)
+                    complete(f)
+                  }
+                }
+              }
           }
         }
       }
   }
-
 }
