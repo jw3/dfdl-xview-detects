@@ -1,3 +1,5 @@
+import sbt.ProjectRef
+
 lazy val `dfdl-xview-detects` =
   project
     .in(file("."))
@@ -18,6 +20,12 @@ lazy val `detects-schema` =
       crossPaths := false
     )
     .enablePlugins(GitVersioning)
+    .dependsOn(
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-lib"),
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-core"),
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-runtime1"),
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-sapi"),
+    )
 
 lazy val `detects-service` =
   project
@@ -31,12 +39,18 @@ lazy val `detects-service` =
       libraryDependencies ++= commonLibraries
     )
     .enablePlugins(GitVersioning, JavaServerAppPackaging)
+    .dependsOn(
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-core"),
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-runtime1"),
+      ProjectRef(uri(s"git://github.com/apache/incubator-daffodil.git#$daffodilVersion"), "daffodil-sapi"),
+    )
 
 /**
   *
   * Commons
   *
   */
+lazy val daffodilVersion = "v2.7.0"
 lazy val commonSettings = Seq(
   organization := "com.ctc",
   scalaVersion := "2.12.11",
@@ -58,7 +72,6 @@ lazy val commonSettings = Seq(
 lazy val commonLibraries = {
   Seq(
     "com.iheart" %% "ficus" % "1.4.0",
-    "org.apache.daffodil" %% "daffodil-sapi" % "latest.integration",
     "com.typesafe.akka" %% "akka-actor-typed" % "2.6.5",
     "com.typesafe.akka" %% "akka-stream" % "2.6.5",
     "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.12",
